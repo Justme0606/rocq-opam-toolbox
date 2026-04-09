@@ -21,7 +21,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: opam install -y rocq.9.0.1
+      - run: opam install -y coq.9.0.1
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
