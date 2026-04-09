@@ -341,6 +341,12 @@ HEADER
       - uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${OCAML_VERSION}
+          opam-repositories: |
+            coq-core-dev: https://coq.inria.fr/opam/core-dev
+            coq-extra-dev: https://coq.inria.fr/opam/extra-dev
+            coq-released: https://coq.inria.fr/opam/released
+            archive: git+https://github.com/ocaml/opam-repository-archive
+            default: https://opam.ocaml.org
 JOB
 
     # Restore caches from dependencies
