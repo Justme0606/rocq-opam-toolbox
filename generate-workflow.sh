@@ -1,25 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# generate-workflow.sh — Generate a GitHub Actions CI workflow from a Rocq Platform package pick
+# generate-workflow-rocq-graph.sh — Generate a GitHub Actions CI workflow
+# from a Rocq Platform package-pick, preserving the Rocq/Coq dependency graph.
 #
-# Usage:
-#   ./generate-workflow.sh <package-pick-file.sh>
-#   ./generate-workflow.sh --url <version>   (e.g. --url 9.0~2025.08)
+# Important rule:
+#   - package-pick packages are the requested targets;
+#   - every transitive dependency whose name is coq, rocq, coq-* or rocq-*
+#     is added as an intermediate job, even when it is not in package-pick;
+#   - each job's `needs` contains its direct Rocq/Coq dependencies.
 
-##############################################################################
-# Configuration
-##############################################################################
-
-# OCaml packages to exclude from the dependency graph (not Rocq/Coq packages)
 EXCLUDED_PACKAGES=(
   ocamlfind dune dune-configurator sexplib sexplib0 elpi menhir gappa eprover
   z3_tptp ott ppx_optcomp
 )
-
-##############################################################################
-# Helpers
-##############################################################################
 
 die() { echo "Error: $*" >&2; exit 1; }
 
@@ -31,17 +25,16 @@ is_excluded() {
   return 1
 }
 
-# Sanitize a package name for use as a YAML job id (lowercase, alphanumeric + hyphens)
 job_id() {
   echo "$1" | tr '.' '-' | tr '_' '-' | tr '[:upper:]' '[:lower:]'
 }
 
-##############################################################################
-# Parse arguments
-##############################################################################
+is_rocq_or_coq_pkg() {
+  local name="$1"
+  [[ "$name" == "coq" || "$name" == "rocq" || "$name" == coq-* || "$name" == rocq-* ]]
+}
 
 PICK_FILE=""
-
 if [[ "${1:-}" == "--url" ]]; then
   VERSION="${2:?Missing version argument for --url}"
   PICK_FILE=$(mktemp /tmp/package-pick-XXXXXX.sh)
@@ -54,84 +47,54 @@ else
   [[ -f "$PICK_FILE" ]] || die "File not found: $PICK_FILE"
 fi
 
-##############################################################################
-# Step 1: Extract OCaml version
-##############################################################################
-
 OCAML_VERSION=$(grep -oP 'COQ_PLATFORM_OCAML_VERSION="\K[^"]+' "$PICK_FILE" || echo "4.14.2")
-echo "OCaml version: $OCAML_VERSION"
-
-##############################################################################
-# Step 2: Extract version postfix for naming
-##############################################################################
-
 VERSION_POSTFIX=$(grep -oP 'COQ_PLATFORM_PACKAGE_PICK_POSTFIX="\K[^"]+' "$PICK_FILE" || echo "unknown")
+
+echo "OCaml version: $OCAML_VERSION"
 echo "Version postfix: $VERSION_POSTFIX"
-
-##############################################################################
-# Step 3: Parse packages from the pick file
-#
-# Strategy: preprocess the file to remove conditional blocks we want to skip,
-# then extract all PACKAGES="${PACKAGES} ..." tokens.
-##############################################################################
-
 echo "Parsing package pick..."
 
 parse_packages() {
   local file="$1"
-
-  # We use awk to filter out:
-  # 1. Blocks inside "if false" ... "fi"
-  # 2. Content inside case blocks for COMPCERT/UNIMATH/FIATCRYPTO
-  # 3. The "extended" section (EXTENT =~ ^[xX])
-  # Then we extract PACKAGES lines and parse tokens.
-
   awk '
     BEGIN { skip = 0; extended = 0 }
-
-    # Skip "if false" blocks
     /^[[:space:]]*if false/ { skip++; next }
     skip > 0 && /^[[:space:]]*fi/ { skip--; next }
     skip > 0 { next }
-
-    # Skip case blocks for optional packages
     /case "\$COQ_PLATFORM_UNIMATH"/ { skip++; next }
     /case "\$COQ_PLATFORM_COMPCERT"/ { skip++; next }
     /case "\$COQ_PLATFORM_VST"/ { skip++; next }
     /case "\$COQ_PLATFORM_FIATCRYPTO"/ { skip++; next }
     skip > 0 && /esac/ { skip--; next }
     skip > 0 { next }
-
-    # Skip extended section
     /COQ_PLATFORM_EXTENT.*\^\[xX\]/ { extended = 1; next }
     extended && /^fi/ { extended = 0; next }
     extended { next }
-
-    # Extract PACKAGES lines
     /PACKAGES="\$\{PACKAGES\}/ { print }
   ' "$file" \
   | grep -oP '(?<=PACKAGES="\$\{PACKAGES\} )[^"]+' \
   | tr ' ' '\n' \
   | while read -r token; do
       [[ -z "$token" ]] && continue
-      # PIN.name.version → name.version (strip PIN prefix)
-      if [[ "$token" == PIN.* ]]; then
-        token="${token#PIN.}"
-      fi
+      [[ "$token" == PIN.* ]] && token="${token#PIN.}"
       echo "$token"
     done
 }
 
-# Build associative arrays: name→version, name.version list
-declare -A PKG_VERSION  # name → version
-declare -a PKG_LIST     # ordered list of name.version
+declare -A PKG_VERSION      # package -> version, only for package-pick targets
+declare -A IS_PICK_PACKAGE  # package -> 1 if it comes from package-pick
+declare -A PKG_SET          # every node in graph
+declare -a PKG_LIST         # ordered graph nodes
+
+enqueue_pkg() {
+  local name="$1"
+  if [[ -z "${PKG_SET[$name]:-}" ]]; then
+    PKG_SET["$name"]=1
+    PKG_LIST+=("$name")
+  fi
+}
 
 while read -r nv; do
-  # Split name.version — package names can contain hyphens, the version starts after last dot-separated numeric
-  # Actually opam convention: name.version where version starts at first digit-segment after a dot
-  # We need to handle e.g. coq-mathcomp-ssreflect.2.4.0 → name=coq-mathcomp-ssreflect, version=2.4.0
-  # Also: coq.9.0.1 → name=coq, version=9.0.1
-  # Strategy: find the first dot followed by a digit
   if [[ "$nv" =~ ^([a-zA-Z][a-zA-Z0-9_-]*)\.([0-9v].*)$ ]]; then
     name="${BASH_REMATCH[1]}"
     version="${BASH_REMATCH[2]}"
@@ -140,158 +103,100 @@ while read -r nv; do
     continue
   fi
   PKG_VERSION["$name"]="$version"
-  PKG_LIST+=("$name")
+  IS_PICK_PACKAGE["$name"]=1
+  enqueue_pkg "$name"
 done < <(parse_packages "$PICK_FILE")
 
-echo "Found ${#PKG_LIST[@]} packages"
+echo "Found ${#PKG_LIST[@]} package-pick packages"
 
-# Build a set for quick membership check
-declare -A PKG_SET
-for name in "${PKG_LIST[@]}"; do
-  PKG_SET["$name"]=1
+# Always keep known roots visible as graph nodes.
+for root in coq coq-core coq-stdlib coqide-server rocq-core rocq-stdlib rocqide; do
+  enqueue_pkg "$root"
 done
 
-# Add virtual/root packages that may not appear explicitly in the package pick,
-# but that are useful as first-level nodes in the generated CI graph.
-# This lets jobs depend on rocq-core / rocq-stdlib directly instead of aliasing
-# everything back to the coq metapackage.
-ROOT_PACKAGES=(rocq-core coq-core rocq-stdlib coq-stdlib coqide-server)
-for root in "${ROOT_PACKAGES[@]}"; do
-  if [[ -z "${PKG_SET[$root]:-}" ]]; then
-    PKG_SET["$root"]=1
-    PKG_LIST=("$root" "${PKG_LIST[@]}")
-  fi
-done
-
-# Build a mapping for coq↔rocq name variants to handle transitional packages
-# e.g. "rocq-mathcomp-ssreflect" → "coq-mathcomp-ssreflect" if the latter is in pick
-declare -A NAME_ALIAS
-for name in "${PKG_LIST[@]}"; do
-  # coq-X → rocq-X alias
-  if [[ "$name" == coq-* ]]; then
-    alt="rocq-${name#coq-}"
-    NAME_ALIAS["$alt"]="$name"
-  elif [[ "$name" == rocq-* ]]; then
-    alt="coq-${name#rocq-}"
-    NAME_ALIAS["$alt"]="$name"
-  fi
-done
-
-# Resolve a dependency name to a pick package name (or empty if not in pick)
-resolve_dep() {
-  local dep="$1"
-  if [[ -n "${PKG_SET[$dep]:-}" ]]; then
-    echo "$dep"
-  elif [[ -n "${NAME_ALIAS[$dep]:-}" ]]; then
-    echo "${NAME_ALIAS[$dep]}"
-  fi
+extract_dep_names() {
+  local raw_deps="$1"
+  echo "$raw_deps" | grep -oP '"[a-zA-Z][a-zA-Z0-9_-]*"' | tr -d '"' | sort -u || true
 }
 
-##############################################################################
-# Step 4: Resolve dependencies via opam
-##############################################################################
-
-echo "Resolving dependencies via opam..."
-
-declare -A PKG_DEPS  # name → space-separated list of dependency names (within pick)
-
-# Return the package selector to pass to opam.
-# Pick packages use an exact version. Virtual/root packages may not be in the pick;
-# in that case, ask opam for the installed/available package by name only.
-opam_selector() {
+opam_depends_raw() {
   local name="$1"
   local version="${PKG_VERSION[$name]:-}"
+  local raw=""
+
+  # Try exact package-pick version first, then package name.
   if [[ -n "$version" ]]; then
-    echo "$name.$version"
-  else
-    echo "$name"
+    raw=$(opam show --field=depends "${name}.${version}" 2>/dev/null || true)
   fi
+  if [[ -z "$raw" ]]; then
+    raw=$(opam show --field=depends "$name" 2>/dev/null || true)
+  fi
+
+  # Transitional fallback: rocq-X may be available as coq-X, or the opposite.
+  if [[ -z "$raw" && "$name" == rocq-* ]]; then
+    raw=$(opam show --field=depends "coq-${name#rocq-}" 2>/dev/null || true)
+  elif [[ -z "$raw" && "$name" == coq-* ]]; then
+    raw=$(opam show --field=depends "rocq-${name#coq-}" 2>/dev/null || true)
+  fi
+
+  printf '%s\n' "$raw"
 }
 
-resolve_pkg_deps() {
-  local raw_deps="$1"
-  # Extract all quoted package names from opam depends output
-  echo "$raw_deps" | grep -oP '"[a-zA-Z][a-zA-Z0-9_-]*"' | tr -d '"' | sort -u
-}
+declare -A PKG_DEPS # package -> direct Rocq/Coq deps
 
-for name in "${PKG_LIST[@]}"; do
-  version="${PKG_VERSION[$name]:-}"
-  selector=$(opam_selector "$name")
+echo "Resolving transitive Rocq/Coq graph via opam show --field=depends..."
+idx=0
+while [[ $idx -lt ${#PKG_LIST[@]} ]]; do
+  name="${PKG_LIST[$idx]}"
+  idx=$((idx + 1))
 
-  # Query opam for direct dependencies only
-  raw_deps=$(opam info --field depends: "$selector" 2>/dev/null || echo "")
-
-  # Parse dependency names and resolve against the pick
+  raw_deps=$(opam_depends_raw "$name")
   dep_names=()
-  declare -A seen_deps=()
+  declare -A seen=()
+
   while IFS= read -r dep; do
     [[ -z "$dep" ]] && continue
-    resolved=$(resolve_dep "$dep")
-    if [[ -n "$resolved" && -z "${seen_deps[$resolved]:-}" && "$resolved" != "$name" ]]; then
-      dep_names+=("$resolved")
-      seen_deps["$resolved"]=1
-    fi
-  done < <(resolve_pkg_deps "$raw_deps")
+    is_rocq_or_coq_pkg "$dep" || continue
+    [[ "$dep" == "$name" ]] && continue
+    [[ -n "${seen[$dep]:-}" ]] && continue
 
-  # For transitional coq-* packages that only depend on rocq-*, also resolve
-  # the deps of the rocq-* variant to get real dependencies
-  if [[ "$name" == coq-* && ${#dep_names[@]} -le 1 ]]; then
-    rocq_variant="rocq-${name#coq-}"
-    if [[ -n "$version" ]]; then
-      rocq_deps=$(opam info --field depends: "$rocq_variant.$version" 2>/dev/null || echo "")
-    else
-      rocq_deps=$(opam info --field depends: "$rocq_variant" 2>/dev/null || echo "")
-    fi
-    if [[ -n "$rocq_deps" ]]; then
-      while IFS= read -r dep; do
-        [[ -z "$dep" ]] && continue
-        resolved=$(resolve_dep "$dep")
-        if [[ -n "$resolved" && -z "${seen_deps[$resolved]:-}" && "$resolved" != "$name" ]]; then
-          dep_names+=("$resolved")
-          seen_deps["$resolved"]=1
-        fi
-      done < <(resolve_pkg_deps "$rocq_deps")
-    fi
-  fi
-  unset seen_deps
+    seen["$dep"]=1
+    dep_names+=("$dep")
+    enqueue_pkg "$dep"
+  done < <(extract_dep_names "$raw_deps")
 
+  unset seen
   PKG_DEPS["$name"]="${dep_names[*]:-}"
 
   if [[ -n "${dep_names[*]:-}" ]]; then
-    echo "  $name → ${dep_names[*]}"
+    echo "  $name -> ${dep_names[*]}"
   else
-    echo "  $name → (no deps in pick)"
+    echo "  $name -> (no direct Rocq/Coq deps found)"
   fi
+
 done
 
-##############################################################################
-# Step 4b: Build direct reverse dependency levels
-#
-# PKG_DEPS stores direct dependencies: package -> dependencies.
-# GitHub Actions `needs` uses exactly this direction: a package job waits for the
-# jobs of its direct dependencies. The resulting workflow naturally displays the
-# inverse view: roots first, then direct dependents level by level.
-##############################################################################
-
-##############################################################################
-# Step 5: Generate workflow YAML
-##############################################################################
-
-# Determine output file
 SAFE_VERSION=$(echo "$VERSION_POSTFIX" | tr '~' '-' | tr '.' '-')
 OUTPUT_DIR=".github/workflows"
 OUTPUT_FILE="${OUTPUT_DIR}/opam-ci${SAFE_VERSION}.yml"
-
+DEBUG_FILE="${OUTPUT_DIR}/opam-ci${SAFE_VERSION}.graph.txt"
 mkdir -p "$OUTPUT_DIR"
-
-echo "Generating workflow: $OUTPUT_FILE"
-
-# Extract a short display version from the postfix (e.g. "9.0" from "~9.0~2025.08")
 DISPLAY_VERSION=$(echo "$VERSION_POSTFIX" | sed 's/^~//; s/~.*$//')
 
+echo "Writing graph debug file: $DEBUG_FILE"
+{
+  echo "# Direct Rocq/Coq dependency graph generated from opam show --field=depends"
+  echo "# Format: package: dep1 dep2 ..."
+  for name in "${PKG_LIST[@]}"; do
+    is_excluded "$name" && continue
+    echo "$name: ${PKG_DEPS[$name]:-}"
+  done
+} > "$DEBUG_FILE"
+
+echo "Generating workflow: $OUTPUT_FILE"
 {
   cat <<HEADER
-# Auto-generated by generate-workflow.sh — do not edit manually
+# Auto-generated by generate-workflow-rocq-graph.sh — do not edit manually
 name: "Rocq Platform CI (opam) - ${DISPLAY_VERSION}"
 
 on:
@@ -302,45 +207,35 @@ on:
 env:
   OCAML_VERSION: "${OCAML_VERSION}"
 
+jobs:
 HEADER
 
-  echo "jobs:"
-
   for name in "${PKG_LIST[@]}"; do
-    # Skip excluded packages
     is_excluded "$name" && continue
 
-    version="${PKG_VERSION[$name]:-}"
     jid=$(job_id "$name")
+    version="${PKG_VERSION[$name]:-}"
     deps="${PKG_DEPS[$name]:-}"
 
     if [[ -n "$version" ]]; then
       install_target="${name}.${version}"
     else
-      install_target="${name}"
+      install_target="$name"
     fi
 
-    # Build the needs list — only include non-excluded deps
     needs_list=()
-    for dep in $deps; do
-      is_excluded "$dep" && continue
-      needs_list+=("$(job_id "$dep")")
-    done
-
-    # Build cache restore keys from direct dependencies
     restore_keys=()
     for dep in $deps; do
       is_excluded "$dep" && continue
+      needs_list+=("$(job_id "$dep")")
       restore_keys+=("opam-\${{ runner.os }}-$(job_id "$dep")-\${{ github.sha }}")
     done
 
     echo ""
     echo "  ${jid}:"
-
     if [[ ${#needs_list[@]} -gt 0 ]]; then
       needs_str=$(printf ', %s' "${needs_list[@]}")
-      needs_str="${needs_str:2}"  # remove leading ", "
-      echo "    needs: [${needs_str}]"
+      echo "    needs: [${needs_str:2}]"
     fi
 
     cat <<JOB
@@ -357,17 +252,14 @@ HEADER
             default: https://opam.ocaml.org
 JOB
 
-    # Restore caches from dependencies
-    if [[ ${#restore_keys[@]} -gt 0 ]]; then
-      for rk in "${restore_keys[@]}"; do
-        cat <<RESTORE
+    for rk in "${restore_keys[@]}"; do
+      cat <<RESTORE
       - uses: actions/cache/restore@v4
         with:
           path: ~/.opam
           key: ${rk}
 RESTORE
-      done
-    fi
+    done
 
     cat <<INSTALL
       - run: opam install -y ${install_target}
@@ -383,5 +275,7 @@ INSTALL
 
 echo ""
 echo "Workflow generated: $OUTPUT_FILE"
+echo "Graph debug generated: $DEBUG_FILE"
 echo "Jobs: $(grep -c 'runs-on:' "$OUTPUT_FILE")"
+echo "Check mathcomp with: grep -E 'rocq-mathcomp-ssreflect|rocq-mathcomp-boot' '$DEBUG_FILE' '$OUTPUT_FILE'"
 echo "Done."
