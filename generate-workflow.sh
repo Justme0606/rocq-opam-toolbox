@@ -151,6 +151,18 @@ for name in "${PKG_LIST[@]}"; do
   PKG_SET["$name"]=1
 done
 
+# Add virtual/root packages that may not appear explicitly in the package pick,
+# but that are useful as first-level nodes in the generated CI graph.
+# This lets jobs depend on rocq-core / rocq-stdlib directly instead of aliasing
+# everything back to the coq metapackage.
+ROOT_PACKAGES=(rocq-core coq-core rocq-stdlib coq-stdlib coqide-server)
+for root in "${ROOT_PACKAGES[@]}"; do
+  if [[ -z "${PKG_SET[$root]:-}" ]]; then
+    PKG_SET["$root"]=1
+    PKG_LIST=("$root" "${PKG_LIST[@]}")
+  fi
+done
+
 # Build a mapping for coq↔rocq name variants to handle transitional packages
 # e.g. "rocq-mathcomp-ssreflect" → "coq-mathcomp-ssreflect" if the latter is in pick
 declare -A NAME_ALIAS
@@ -162,14 +174,6 @@ for name in "${PKG_LIST[@]}"; do
   elif [[ "$name" == rocq-* ]]; then
     alt="coq-${name#rocq-}"
     NAME_ALIAS["$alt"]="$name"
-  fi
-  # coq ↔ rocq-core: the "coq" metapackage bundles rocq-core, so
-  # dependencies on "rocq-core" or "coq-core" should resolve to "coq" if
-  # "coq" is in the pick. But do NOT alias "coq" → "rocq-core" to avoid
-  # cycles (rocq-stdlib depends on rocq-core which would map back to coq).
-  if [[ "$name" == "coq" ]]; then
-    NAME_ALIAS["rocq-core"]="coq"
-    NAME_ALIAS["coq-core"]="coq"
   fi
 done
 
@@ -191,6 +195,19 @@ echo "Resolving dependencies via opam..."
 
 declare -A PKG_DEPS  # name → space-separated list of dependency names (within pick)
 
+# Return the package selector to pass to opam.
+# Pick packages use an exact version. Virtual/root packages may not be in the pick;
+# in that case, ask opam for the installed/available package by name only.
+opam_selector() {
+  local name="$1"
+  local version="${PKG_VERSION[$name]:-}"
+  if [[ -n "$version" ]]; then
+    echo "$name.$version"
+  else
+    echo "$name"
+  fi
+}
+
 resolve_pkg_deps() {
   local raw_deps="$1"
   # Extract all quoted package names from opam depends output
@@ -198,10 +215,11 @@ resolve_pkg_deps() {
 }
 
 for name in "${PKG_LIST[@]}"; do
-  version="${PKG_VERSION[$name]}"
+  version="${PKG_VERSION[$name]:-}"
+  selector=$(opam_selector "$name")
 
-  # Query opam for dependencies
-  raw_deps=$(opam info --field depends: "$name.$version" 2>/dev/null || echo "")
+  # Query opam for direct dependencies only
+  raw_deps=$(opam info --field depends: "$selector" 2>/dev/null || echo "")
 
   # Parse dependency names and resolve against the pick
   dep_names=()
@@ -219,7 +237,11 @@ for name in "${PKG_LIST[@]}"; do
   # the deps of the rocq-* variant to get real dependencies
   if [[ "$name" == coq-* && ${#dep_names[@]} -le 1 ]]; then
     rocq_variant="rocq-${name#coq-}"
-    rocq_deps=$(opam info --field depends: "$rocq_variant.$version" 2>/dev/null || echo "")
+    if [[ -n "$version" ]]; then
+      rocq_deps=$(opam info --field depends: "$rocq_variant.$version" 2>/dev/null || echo "")
+    else
+      rocq_deps=$(opam info --field depends: "$rocq_variant" 2>/dev/null || echo "")
+    fi
     if [[ -n "$rocq_deps" ]]; then
       while IFS= read -r dep; do
         [[ -z "$dep" ]] && continue
@@ -243,33 +265,13 @@ for name in "${PKG_LIST[@]}"; do
 done
 
 ##############################################################################
-# Step 4b: Break dependency cycles
+# Step 4b: Build direct reverse dependency levels
 #
-# The coq/rocq transitional packages create cycles (e.g. coq → rocq-stdlib
-# → rocq-core → coq). We detect and break them by removing back-edges.
+# PKG_DEPS stores direct dependencies: package -> dependencies.
+# GitHub Actions `needs` uses exactly this direction: a package job waits for the
+# jobs of its direct dependencies. The resulting workflow naturally displays the
+# inverse view: roots first, then direct dependents level by level.
 ##############################################################################
-
-echo "Checking for dependency cycles..."
-
-{
-  _changed=1
-  while [[ $_changed -eq 1 ]]; do
-    _changed=0
-    for _name in "${PKG_LIST[@]}"; do
-      _deps="${PKG_DEPS[$_name]:-}"
-      for _dep in $_deps; do
-        _dep_deps="${PKG_DEPS[$_dep]:-}"
-        for _dd in $_dep_deps; do
-          if [[ "$_dd" == "$_name" ]]; then
-            echo "  Breaking cycle: $_name → $_dep → $_name (removing $_dep → $_name)"
-            PKG_DEPS["$_dep"]=$(echo "${PKG_DEPS[$_dep]}" | tr ' ' '\n' | { grep -v "^${_name}$" || true; } | tr '\n' ' ' | sed 's/ *$//')
-            _changed=1
-          fi
-        done
-      done
-    done
-  done
-}
 
 ##############################################################################
 # Step 5: Generate workflow YAML
@@ -308,9 +310,15 @@ HEADER
     # Skip excluded packages
     is_excluded "$name" && continue
 
-    version="${PKG_VERSION[$name]}"
+    version="${PKG_VERSION[$name]:-}"
     jid=$(job_id "$name")
     deps="${PKG_DEPS[$name]:-}"
+
+    if [[ -n "$version" ]]; then
+      install_target="${name}.${version}"
+    else
+      install_target="${name}"
+    fi
 
     # Build the needs list — only include non-excluded deps
     needs_list=()
@@ -362,7 +370,7 @@ RESTORE
     fi
 
     cat <<INSTALL
-      - run: opam install -y ${name}.${version}
+      - run: opam install -y ${install_target}
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
