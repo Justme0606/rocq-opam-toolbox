@@ -50,6 +50,14 @@ fi
 OCAML_VERSION=$(grep -oP 'COQ_PLATFORM_OCAML_VERSION="\K[^"]+' "$PICK_FILE" || echo "4.14.2")
 VERSION_POSTFIX=$(grep -oP 'COQ_PLATFORM_PACKAGE_PICK_POSTFIX="\K[^"]+' "$PICK_FILE" || echo "unknown")
 
+DUNE_VERSION=$(grep -oP 'PIN\.dune\.\K[^"]+' "$PICK_FILE" | head -1 || true)
+DUNE_CONFIGURATOR_VERSION=$(grep -oP 'PIN\.dune-configurator\.\K[^"]+' "$PICK_FILE" | head -1 || true)
+OCAMLFIND_VERSION=$(grep -oP 'PIN\.ocamlfind\.\K[^"]+' "$PICK_FILE" | head -1 || true)
+
+echo "Dune version: ${DUNE_VERSION:-<none>}"
+echo "Dune-configurator version: ${DUNE_CONFIGURATOR_VERSION:-<none>}"
+echo "Ocamlfind version: ${OCAMLFIND_VERSION:-<none>}"
+
 echo "OCaml version: $OCAML_VERSION"
 echo "Version postfix: $VERSION_POSTFIX"
 echo "Parsing package pick..."
@@ -260,7 +268,29 @@ JOB
           key: ${rk}
 RESTORE
     done
+    if [[ -n "${OCAMLFIND_VERSION:-}" ]]; then
+      cat <<PIN
+      - run: |
+          opam pin add -y -n ocamlfind ${OCAMLFIND_VERSION}
+          opam install -y ocamlfind.${OCAMLFIND_VERSION}
+PIN
+    fi
 
+    if [[ -n "${DUNE_VERSION:-}" ]]; then
+      cat <<PIN
+      - run: |
+          opam pin add -y -n dune ${DUNE_VERSION}
+          opam install -y dune.${DUNE_VERSION}
+PIN
+    fi
+
+    if [[ -n "${DUNE_CONFIGURATOR_VERSION:-}" ]]; then
+      cat <<PIN
+      - run: |
+          opam pin add -y -n dune-configurator ${DUNE_CONFIGURATOR_VERSION}
+          opam install -y dune-configurator.${DUNE_CONFIGURATOR_VERSION}
+PIN
+    fi
     cat <<INSTALL
       - run: opam install -y ${install_target}
         env:
