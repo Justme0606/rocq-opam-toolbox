@@ -1,0 +1,27 @@
+# Secrets and credentials
+*.key
+*.pem
+*.p12
+*.pfx
+.env
+.env.*
+*secret*
+*credential*
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+.vscode/
+.idea/

@@ -1,0 +1,69 @@
+# Direct Rocq/Coq dependency graph generated from opam show --field=depends
+# Format: package: dep1 dep2 ...
+coq: coq-core coq-stdlib
+rocq-stdlib: rocq-core rocq-runtime
+rocqide: 
+vsrocq-language-server: coq-core coq-stdlib rocq-core
+rocq-bignums: rocq-core rocq-stdlib
+coq-ext-lib: coq coq-core rocq-stdlib
+rocq-stdpp: rocq-core rocq-stdlib
+rocq-elpi: rocq-core rocq-stdlib
+rocq-hierarchy-builder: rocq-core rocq-elpi
+rocq-mathcomp-ssreflect: rocq-mathcomp-boot rocq-mathcomp-order
+coq-mathcomp-ssreflect: coq-core rocq-mathcomp-ssreflect
+rocq-mathcomp-fingroup: rocq-mathcomp-boot
+rocq-mathcomp-algebra: rocq-mathcomp-fingroup rocq-mathcomp-order
+rocq-mathcomp-solvable: rocq-mathcomp-algebra
+rocq-mathcomp-field: rocq-mathcomp-solvable
+rocq-mathcomp-character: rocq-mathcomp-field
+rocq-mathcomp-bigenough: coq coq-mathcomp-ssreflect rocq-core rocq-mathcomp-boot
+rocq-mathcomp-finmap: coq coq-mathcomp-ssreflect rocq-core rocq-mathcomp-ssreflect
+coq-mathcomp-real-closed: coq coq-core coq-mathcomp-algebra coq-mathcomp-bigenough coq-mathcomp-field coq-mathcomp-ssreflect
+coq-mathcomp-zify: coq coq-mathcomp-algebra coq-mathcomp-ssreflect
+coq-mathcomp-multinomials: coq coq-core coq-mathcomp-algebra coq-mathcomp-bigenough coq-mathcomp-finmap coq-mathcomp-ssreflect
+coq-coquelicot: coq coq-mathcomp-ssreflect
+coq-coqprime: coq coq-bignums
+coq-coqprime-generator: 
+coq-flocq: coq coq-core coq-stdlib rocq-stdlib
+coq-interval: coq coq-bignums coq-coquelicot coq-core coq-flocq coq-mathcomp-ssreflect coq-stdlib
+coq-gappa: coq coq-flocq
+coq-math-classes: coq coq-bignums
+coq-corn: coq coq-bignums coq-elpi coq-math-classes
+coq-hott: coq coq-core rocq-core
+coq-simple-io: coq coq-ext-lib
+coq-menhirlib: coq
+rocq-equations: coq-core rocq-core rocq-stdlib
+rocq-aac-tactics: rocq-core rocq-stdlib
+coq-unicoq: coq
+coq-mtac2: coq coq-unicoq
+coq-quickchick: coq coq-ext-lib coq-mathcomp-ssreflect coq-simple-io
+coq-hammer-tactics: coq
+coq-hammer: coq coq-hammer-tactics
+coq-coqeal: coq coq-bignums coq-elpi coq-hierarchy-builder coq-mathcomp-algebra coq-mathcomp-multinomials coq-mathcomp-real-closed coq-mathcomp-ssreflect
+rocq-libhyps: rocq-core rocq-stdlib
+coq-itauto: coq
+coq-mathcomp-analysis: rocq-mathcomp-analysis
+coq-mathcomp-algebra-tactics: coq coq-core coq-elpi coq-mathcomp-algebra coq-mathcomp-ssreflect coq-mathcomp-zify coq-stdlib
+rocq-relation-algebra: rocq-core rocq-stdlib
+coq-reglang: coq coq-hierarchy-builder coq-mathcomp-ssreflect
+rocq-iris: rocq-core rocq-stdlib rocq-stdpp
+rocq-iris-heap-lang: rocq-iris
+coq-ott: coq
+coq-mathcomp-word: coq coq-mathcomp-algebra coq-mathcomp-ssreflect
+coq-core: rocq-runtime
+coq-stdlib: coq-core rocq-stdlib
+coqide-server: rocq-runtime
+rocq-core: rocq-runtime
+rocq-runtime: 
+rocq-mathcomp-boot: coq rocq-core rocq-hierarchy-builder
+rocq-mathcomp-order: rocq-mathcomp-boot
+coq-mathcomp-algebra: rocq-mathcomp-algebra
+coq-mathcomp-bigenough: rocq-mathcomp-bigenough
+coq-mathcomp-field: rocq-mathcomp-field
+coq-mathcomp-finmap: rocq-mathcomp-finmap
+coq-bignums: coq-stdlib rocq-bignums
+coq-elpi: coq-core rocq-elpi
+coq-hierarchy-builder: coq-core rocq-hierarchy-builder
+rocq-mathcomp-analysis: rocq-mathcomp-bigenough rocq-mathcomp-field rocq-mathcomp-reals rocq-mathcomp-solvable
+rocq-mathcomp-reals: rocq-mathcomp-classical
+rocq-mathcomp-classical: rocq-core rocq-hierarchy-builder rocq-mathcomp-algebra rocq-mathcomp-fingroup rocq-mathcomp-finmap rocq-mathcomp-ssreflect
