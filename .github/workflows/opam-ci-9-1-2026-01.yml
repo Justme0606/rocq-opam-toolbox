@@ -163,8 +163,8 @@ jobs:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-ext-lib-${{ github.sha }}
 
-  coq-stdpp:
-    needs: [coq]
+  rocq-stdpp:
+    needs: [coq, rocq-stdlib]
     runs-on: ubuntu-latest
     steps:
       - uses: ocaml/setup-ocaml@v3
@@ -180,13 +180,17 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-${{ github.sha }}
-      - run: opam install -y coq-stdpp.1.12.0
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.opam
+          key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
+      - run: opam install -y rocq-stdpp.1.13.0
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
         with:
           path: ~/.opam
-          key: opam-${{ runner.os }}-coq-stdpp-${{ github.sha }}
+          key: opam-${{ runner.os }}-rocq-stdpp-${{ github.sha }}
 
   rocq-elpi:
     needs: [coq, rocq-stdlib]
@@ -209,7 +213,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: opam install -y rocq-elpi.3.2.0
+      - run: opam install -y rocq-elpi.3.3.1
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
@@ -415,7 +419,7 @@ jobs:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-character-${{ github.sha }}
 
-  coq-mathcomp-bigenough:
+  rocq-mathcomp-bigenough:
     needs: [coq, coq-mathcomp-ssreflect]
     runs-on: ubuntu-latest
     steps:
@@ -436,13 +440,13 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-ssreflect-${{ github.sha }}
-      - run: opam install -y coq-mathcomp-bigenough.1.0.3
+      - run: opam install -y rocq-mathcomp-bigenough.1.0.4
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
         with:
           path: ~/.opam
-          key: opam-${{ runner.os }}-coq-mathcomp-bigenough-${{ github.sha }}
+          key: opam-${{ runner.os }}-rocq-mathcomp-bigenough-${{ github.sha }}
 
   rocq-mathcomp-finmap:
     needs: [coq, coq-mathcomp-ssreflect, rocq-mathcomp-ssreflect]
@@ -478,7 +482,7 @@ jobs:
           key: opam-${{ runner.os }}-rocq-mathcomp-finmap-${{ github.sha }}
 
   coq-mathcomp-real-closed:
-    needs: [coq, rocq-mathcomp-algebra, coq-mathcomp-bigenough, rocq-mathcomp-field, coq-mathcomp-ssreflect]
+    needs: [coq, rocq-mathcomp-algebra, rocq-mathcomp-bigenough, rocq-mathcomp-field, coq-mathcomp-ssreflect]
     runs-on: ubuntu-latest
     steps:
       - uses: ocaml/setup-ocaml@v3
@@ -501,7 +505,7 @@ jobs:
       - uses: actions/cache/restore@v4
         with:
           path: ~/.opam
-          key: opam-${{ runner.os }}-coq-mathcomp-bigenough-${{ github.sha }}
+          key: opam-${{ runner.os }}-rocq-mathcomp-bigenough-${{ github.sha }}
       - uses: actions/cache/restore@v4
         with:
           path: ~/.opam
@@ -552,7 +556,7 @@ jobs:
           key: opam-${{ runner.os }}-coq-mathcomp-zify-${{ github.sha }}
 
   coq-mathcomp-multinomials:
-    needs: [coq, rocq-mathcomp-algebra, coq-mathcomp-bigenough, rocq-mathcomp-finmap, coq-mathcomp-ssreflect]
+    needs: [coq, rocq-mathcomp-algebra, rocq-mathcomp-bigenough, rocq-mathcomp-finmap, coq-mathcomp-ssreflect]
     runs-on: ubuntu-latest
     steps:
       - uses: ocaml/setup-ocaml@v3
@@ -575,7 +579,7 @@ jobs:
       - uses: actions/cache/restore@v4
         with:
           path: ~/.opam
-          key: opam-${{ runner.os }}-coq-mathcomp-bigenough-${{ github.sha }}
+          key: opam-${{ runner.os }}-rocq-mathcomp-bigenough-${{ github.sha }}
       - uses: actions/cache/restore@v4
         with:
           path: ~/.opam
@@ -671,7 +675,7 @@ jobs:
           key: opam-${{ runner.os }}-coq-coqprime-generator-${{ github.sha }}
 
   coq-flocq:
-    needs: [coq]
+    needs: [coq, rocq-stdlib]
     runs-on: ubuntu-latest
     steps:
       - uses: ocaml/setup-ocaml@v3
@@ -687,7 +691,11 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-${{ github.sha }}
-      - run: opam install -y coq-flocq.4.2.1
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.opam
+          key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
+      - run: opam install -y coq-flocq.4.2.2
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
@@ -696,7 +704,7 @@ jobs:
           key: opam-${{ runner.os }}-coq-flocq-${{ github.sha }}
 
   coq-interval:
-    needs: [coq, rocq-bignums, coq-coquelicot, coq-flocq, coq-mathcomp-ssreflect]
+    needs: [coq, rocq-bignums, coq-coquelicot, coq-flocq, coq-mathcomp-ssreflect, rocq-stdlib]
     runs-on: ubuntu-latest
     steps:
       - uses: ocaml/setup-ocaml@v3
@@ -728,7 +736,11 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-ssreflect-${{ github.sha }}
-      - run: opam install -y coq-interval.4.11.3
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.opam
+          key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
+      - run: opam install -y coq-interval.4.11.4
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
@@ -985,7 +997,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-${{ github.sha }}
-      - run: opam install -y coq-unicoq.1.6+8.20
+      - run: opam install -y coq-unicoq.1.6+9.1
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
@@ -1014,7 +1026,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-unicoq-${{ github.sha }}
-      - run: opam install -y coq-mtac2.1.4+9.0
+      - run: opam install -y coq-mtac2.1.4+9.1
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
@@ -1112,31 +1124,6 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-hammer-${{ github.sha }}
-
-  coq-paramcoq:
-    needs: [coq]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: ocaml/setup-ocaml@v3
-        with:
-          ocaml-compiler: 4.14.2
-          opam-repositories: |
-            coq-core-dev: https://coq.inria.fr/opam/core-dev
-            coq-extra-dev: https://coq.inria.fr/opam/extra-dev
-            coq-released: https://coq.inria.fr/opam/released
-            archive: git+https://github.com/ocaml/opam-repository-archive
-            default: https://opam.ocaml.org
-      - uses: actions/cache/restore@v4
-        with:
-          path: ~/.opam
-          key: opam-${{ runner.os }}-coq-${{ github.sha }}
-      - run: opam install -y coq-paramcoq.1.1.3+rocq9.0
-        env:
-          OPAMYES: "1"
-      - uses: actions/cache/save@v4
-        with:
-          path: ~/.opam
-          key: opam-${{ runner.os }}-coq-paramcoq-${{ github.sha }}
 
   coq-coqeal:
     needs: [coq, rocq-bignums, rocq-elpi, rocq-hierarchy-builder, rocq-mathcomp-algebra, coq-mathcomp-multinomials, coq-mathcomp-real-closed, coq-mathcomp-ssreflect]
@@ -1246,7 +1233,7 @@ jobs:
           key: opam-${{ runner.os }}-coq-itauto-${{ github.sha }}
 
   coq-mathcomp-analysis:
-    needs: [coq-mathcomp-bigenough, rocq-mathcomp-field, rocq-mathcomp-solvable]
+    needs: [rocq-mathcomp-bigenough, rocq-mathcomp-field, rocq-mathcomp-solvable]
     runs-on: ubuntu-latest
     steps:
       - uses: ocaml/setup-ocaml@v3
@@ -1261,7 +1248,7 @@ jobs:
       - uses: actions/cache/restore@v4
         with:
           path: ~/.opam
-          key: opam-${{ runner.os }}-coq-mathcomp-bigenough-${{ github.sha }}
+          key: opam-${{ runner.os }}-rocq-mathcomp-bigenough-${{ github.sha }}
       - uses: actions/cache/restore@v4
         with:
           path: ~/.opam
@@ -1270,7 +1257,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-solvable-${{ github.sha }}
-      - run: opam install -y coq-mathcomp-analysis.1.15.0
+      - run: opam install -y coq-mathcomp-analysis.1.16.0
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
@@ -1385,8 +1372,8 @@ jobs:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-reglang-${{ github.sha }}
 
-  coq-iris:
-    needs: [coq, coq-stdpp]
+  rocq-iris:
+    needs: [coq, rocq-stdlib, rocq-stdpp]
     runs-on: ubuntu-latest
     steps:
       - uses: ocaml/setup-ocaml@v3
@@ -1405,17 +1392,21 @@ jobs:
       - uses: actions/cache/restore@v4
         with:
           path: ~/.opam
-          key: opam-${{ runner.os }}-coq-stdpp-${{ github.sha }}
-      - run: opam install -y coq-iris.4.4.0
+          key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.opam
+          key: opam-${{ runner.os }}-rocq-stdpp-${{ github.sha }}
+      - run: opam install -y rocq-iris.4.5.0
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
         with:
           path: ~/.opam
-          key: opam-${{ runner.os }}-coq-iris-${{ github.sha }}
+          key: opam-${{ runner.os }}-rocq-iris-${{ github.sha }}
 
-  coq-iris-heap-lang:
-    needs: [coq-iris]
+  rocq-iris-heap-lang:
+    needs: [rocq-iris]
     runs-on: ubuntu-latest
     steps:
       - uses: ocaml/setup-ocaml@v3
@@ -1430,14 +1421,14 @@ jobs:
       - uses: actions/cache/restore@v4
         with:
           path: ~/.opam
-          key: opam-${{ runner.os }}-coq-iris-${{ github.sha }}
-      - run: opam install -y coq-iris-heap-lang.4.4.0
+          key: opam-${{ runner.os }}-rocq-iris-${{ github.sha }}
+      - run: opam install -y rocq-iris-heap-lang.4.5.0
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
         with:
           path: ~/.opam
-          key: opam-${{ runner.os }}-coq-iris-heap-lang-${{ github.sha }}
+          key: opam-${{ runner.os }}-rocq-iris-heap-lang-${{ github.sha }}
 
   coq-ott:
     needs: [coq]
@@ -1489,35 +1480,10 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-ssreflect-${{ github.sha }}
-      - run: opam install -y coq-mathcomp-word.3.2
+      - run: opam install -y coq-mathcomp-word.3.4
         env:
           OPAMYES: "1"
       - uses: actions/cache/save@v4
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-word-${{ github.sha }}
-
-  coq-dpdgraph:
-    needs: [coq]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: ocaml/setup-ocaml@v3
-        with:
-          ocaml-compiler: 4.14.2
-          opam-repositories: |
-            coq-core-dev: https://coq.inria.fr/opam/core-dev
-            coq-extra-dev: https://coq.inria.fr/opam/extra-dev
-            coq-released: https://coq.inria.fr/opam/released
-            archive: git+https://github.com/ocaml/opam-repository-archive
-            default: https://opam.ocaml.org
-      - uses: actions/cache/restore@v4
-        with:
-          path: ~/.opam
-          key: opam-${{ runner.os }}-coq-${{ github.sha }}
-      - run: opam install -y coq-dpdgraph.1.0+9.1
-        env:
-          OPAMYES: "1"
-      - uses: actions/cache/save@v4
-        with:
-          path: ~/.opam
-          key: opam-${{ runner.os }}-coq-dpdgraph-${{ github.sha }}
