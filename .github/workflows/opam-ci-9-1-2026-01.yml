@@ -31,9 +31,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -69,9 +67,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-runtime-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -98,9 +94,7 @@ jobs:
             coq-released: https://coq.inria.fr/opam/released
             archive: git+https://github.com/ocaml/opam-repository-archive
             default: https://opam.ocaml.org
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -140,9 +134,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-core-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -178,9 +170,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -220,9 +210,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -258,9 +246,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -296,9 +282,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -334,9 +318,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-elpi-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -372,9 +354,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-order-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -410,9 +390,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-ssreflect-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -444,9 +422,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-boot-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -482,9 +458,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-order-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -516,9 +490,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-algebra-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -550,9 +522,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-solvable-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -584,9 +554,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-field-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -630,9 +598,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-boot-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -676,9 +642,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-ssreflect-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -738,9 +702,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-ssreflect-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -780,9 +742,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-ssreflect-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -842,9 +802,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-ssreflect-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -880,9 +838,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-ssreflect-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -918,9 +874,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-bignums-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -947,9 +901,7 @@ jobs:
             coq-released: https://coq.inria.fr/opam/released
             archive: git+https://github.com/ocaml/opam-repository-archive
             default: https://opam.ocaml.org
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -993,9 +945,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1060,9 +1010,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1098,9 +1046,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-flocq-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1136,9 +1082,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-bignums-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1182,9 +1126,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-math-classes-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1224,9 +1166,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-core-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1262,9 +1202,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-ext-lib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1296,9 +1234,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1338,9 +1274,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1376,9 +1310,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1410,9 +1342,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1448,9 +1378,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-unicoq-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1494,9 +1422,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-simple-io-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1528,9 +1454,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1566,9 +1490,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-hammer-tactics-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1638,9 +1560,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-ssreflect-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1676,9 +1596,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1710,9 +1628,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1744,9 +1660,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-analysis-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1811,9 +1725,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1849,9 +1761,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1891,9 +1801,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-ssreflect-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1933,9 +1841,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdpp-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -1967,9 +1873,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-iris-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2001,9 +1905,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2043,9 +1945,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-coq-mathcomp-ssreflect-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2077,9 +1977,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-runtime-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2115,9 +2013,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-stdlib-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2149,9 +2045,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-runtime-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2183,9 +2077,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-runtime-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2212,9 +2104,7 @@ jobs:
             coq-released: https://coq.inria.fr/opam/released
             archive: git+https://github.com/ocaml/opam-repository-archive
             default: https://opam.ocaml.org
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2254,9 +2144,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-hierarchy-builder-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2288,9 +2176,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-boot-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2322,9 +2208,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-algebra-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2356,9 +2240,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-bigenough-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2390,9 +2272,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-field-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2424,9 +2304,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-finmap-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2462,9 +2340,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-bignums-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2500,9 +2376,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-elpi-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2538,9 +2412,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-hierarchy-builder-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2590,9 +2462,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-solvable-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2624,9 +2494,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-classical-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0
@@ -2686,9 +2554,7 @@ jobs:
         with:
           path: ~/.opam
           key: opam-${{ runner.os }}-rocq-mathcomp-ssreflect-${{ github.sha }}
-      - run: |
-          opam pin add -y -n ocamlfind 1.9.8+relocatable
-          opam install -y ocamlfind.1.9.8+relocatable
+
       - run: |
           opam pin add -y -n dune 3.21.0
           opam install -y dune.3.21.0

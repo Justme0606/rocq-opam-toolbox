@@ -268,13 +268,6 @@ JOB
           key: ${rk}
 RESTORE
     done
-    if [[ -n "${OCAMLFIND_VERSION:-}" ]]; then
-      cat <<PIN
-      - run: |
-          opam pin add -y -n ocamlfind ${OCAMLFIND_VERSION}
-          opam install -y ocamlfind.${OCAMLFIND_VERSION}
-PIN
-    fi
 
     if [[ -n "${DUNE_VERSION:-}" ]]; then
       cat <<PIN
